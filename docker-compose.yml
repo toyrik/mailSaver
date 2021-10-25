@@ -1,0 +1,51 @@
+version: '3'
+
+services:
+
+    nginx:
+        build:
+            context: ./docker/
+            dockerfile: nginx.docker
+        volumes:
+            - ./:/src
+        depends_on:
+            - php-fpm
+        ports:
+            - 8000:80
+
+    php-fpm:
+        build:
+            context: ./docker/
+            dockerfile: php-fpm.docker
+        volumes:
+            - ./:/src
+        depends_on:
+            - mysql
+
+    php-cli:
+        build:
+            context: ./docker/
+            dockerfile: php-cli.docker
+        volumes:
+            - ./:/src
+        depends_on:
+            - mysql
+
+    mysql:
+        image: mysql
+        ports:
+            - 3366:3306
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: laravel
+            MYSQL_USER: user
+            MYSQL_PASSWORD: password
+        volumes:
+            - ./storage/docker/mysql:/var/lib/mysql
+
+    adminer:
+        image: adminer
+        ports:
+            - 8080:8080
+        environment:
+            ADMINER_DEFAULT_SERVER: mysql
